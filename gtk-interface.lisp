@@ -16,6 +16,9 @@
                    :reader chars-per-line))
   (:documentation "doc"))
 
+(defgeneric line (display line-nr))
+(defgeneric set-line (display line-nr value))
+
 (defclass line-display/text-view (line-display)
   ((text-buffer :initarg :text-buffer
                 :reader text-buffer))
@@ -28,6 +31,17 @@
             (dotimes (j (chars-per-line line-display))
               (princ #\. stream))
             (terpri stream)))))
+
+(defmethod line ((line-display line-display/text-view) (line-nr integer))
+  ;; account for line breaks
+  (subseq (text-buffer-text (text-buffer line-display))
+          (* line-nr
+             (+ (chars-per-line line-display) 1))
+          (- (* (+ line-nr 1)
+                (+ (chars-per-line line-display) 1))
+             1))
+  ;; todo check for line count and sufficiently filled text-buffer
+  )
 
 (defun ->string (object)
   (format nil "~A" object))
