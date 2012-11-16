@@ -137,6 +137,40 @@
       ;; show the window
       (widget-show window))))
 
-(defun dummy-button-hander (display button-symbol)
-  (setf (text-buffer-text (text-buffer display))
-        (format nil "Clicked button: ~A~%" button-symbol)))
+(defun font-adjustment-test ()
+  (within-main-loop
+    (let-ui (gtk-window
+             :type :toplevel
+             :title "Font Test"
+             :default-height 300
+             :default-width 400
+             :var window
+             (text-view :var display
+                        :editable nil
+                        :wrap-mode :none
+                        :cursor-visible nil
+                        :justification :left
+                        :buffer (make-instance 'text-buffer :text "sample text")))
+      (let ((font-tag (make-instance 'text-tag
+                                     :name "line-display-tag"
+                                     :editable nil
+                                     :font "Monospace"
+                                     :size 12
+                                     ; :style :normal
+                                     ; :weight :normal
+                                     ; :wrap-mode :none
+                                     ; :justification :left
+                                     )))
+        (text-buffer-apply-tag (text-view-buffer display) font-tag 0 7
+                                        ; (length (text-buffer-text (text-view-buffer display)))
+                               ))
+      (connect-signal window "destroy"
+                      (ilambda (w) (leave-gtk-main)))
+      (widget-show window))))
+
+
+(defun dummy-buttons ()
+  (create-button-interface
+   (lambda (display button-symbol)
+     (setf (text-buffer-text (text-buffer display))
+           (format nil "Clicked button: ~A~%" button-symbol)))))
